@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Random;
+
 /*
  *  Sched - The brain damaged scheduler
  *  Copyright (C) 2012  Bart Kuivenhoven
@@ -15,44 +18,46 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class RoundRobbin extends Scheduler {
-	
-	int no_threads = 0;
-	GreenThread threads = null;
-	
-	public RoundRobbin(int prios)
-	{
-		// We're just gonna leave priorities for what they are
-	}
 
+public class RandomScheduler extends Scheduler{
+	private Random r = new Random();
+	ArrayList<GreenThread> threads = null;
+	int priorities = 0;
+	
+	public RandomScheduler(int priorities)
+	{
+		this.priorities = priorities;
+		threads = new ArrayList<GreenThread>();
+	}
+	
 	private void exec()
 	{
-		GreenThread next = null;
-		for (GreenThread t = threads; t != null; t = next)
+		int index = r.nextInt(threads.size());
+		GreenThread t = threads.get(index);
+		if (t.killed())
 		{
-			next = t.next();
-			if (t.killed())
+			while (threads.contains(t))
 			{
-				no_threads--;
-				continue;
+				threads.remove(t);
 			}
-			
-			t.run();
+			return;
 		}
+		else
+			t.run();
 	}
 	
 	@Override
 	public void start() {
-		while (no_threads != 0)
+		while(threads.size() != 0)
+		{
 			exec();
+		}
 	}
 
 	@Override
 	public void threadAdd(GreenThread t) {
-		t.next(threads);
-		threads = t;
-		no_threads++;
-		
+		for (int i = 0; i < (priorities - t.priority); i++)
+			threads.add(t);
 	}
 
 }
