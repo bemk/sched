@@ -18,7 +18,26 @@
 
 public abstract class Scheduler {
 
+	private int next_pid = 1;
+	protected boolean realtime;
+	protected GreenThread signaled = null;
+
 	public abstract void start();
-	public abstract void threadAdd(GreenThread t);
-	
+	public abstract int threadAdd(GreenThread t);
+	public abstract GreenThread getThreadByID(int id);
+
+	protected int next_pid()
+	{
+		return next_pid++;
+	}
+
+	public void signal(int pid, int signal)
+	{
+		GreenThread t = getThreadByID(pid);
+		if (t != null)
+		{
+			t.signal(signal);
+			signaled = t;
+		}
+	}
 }

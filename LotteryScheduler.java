@@ -21,17 +21,24 @@ import java.util.Random;
 
 public class LotteryScheduler extends Scheduler{
 	private Random r = new Random();
-	ArrayList<GreenThread> threads = null;
-	int priorities = 0;
+	private ArrayList<GreenThread> threads = null;
+	private GreenThread signaled = null;
 	
-	public LotteryScheduler(int priorities)
+	public LotteryScheduler(int priorities, boolean realtime)
 	{
-		this.priorities = priorities;
+		super.realtime = realtime;
 		threads = new ArrayList<GreenThread>();
 	}
 	
 	private void exec()
 	{
+		if (super.realtime && signaled != null)
+		{
+			signaled.run();
+			signaled = null;
+			return;
+		}
+
 		int index = r.nextInt(threads.size());
 		GreenThread t = threads.get(index);
 		if (t.killed())
@@ -45,6 +52,15 @@ public class LotteryScheduler extends Scheduler{
 		else
 			t.run();
 	}
+	public GreenThread getThreadByID(int id)
+	{
+		for (GreenThread t : threads)
+		{
+			if (t.pid() == id)
+				return t;
+		}
+		return null;
+	}
 	
 	@Override
 	public void start() {
@@ -55,9 +71,10 @@ public class LotteryScheduler extends Scheduler{
 	}
 
 	@Override
-	public void threadAdd(GreenThread t) {
+	public int threadAdd(GreenThread t) {
+		t.pid(super.next_pid());
 		for (int i = 0; i < t.priority(); i++)
 			threads.add(t);
+		return t.pid();
 	}
-
 }

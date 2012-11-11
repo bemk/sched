@@ -25,17 +25,20 @@ public class PriorityScheduler extends Scheduler {
 	int no_threads = 0;
 	int dbg = 0;
 	
-	public PriorityScheduler(int prios)
+	public PriorityScheduler(int prios, boolean realtime)
 	{
+		super.realtime = realtime;
 		this.prios = prios;
 		threads = new GreenThread[prios];
 	}
 	
-	public void threadAdd(GreenThread t)
+	public int threadAdd(GreenThread t)
 	{
+		t.pid(super.next_pid());
 		t.next(threads[t.priority()]);
 		threads[t.priority()] = t;
 		no_threads++;
+		return t.pid();
 	}
 	
 	private void schedule()
@@ -53,6 +56,11 @@ public class PriorityScheduler extends Scheduler {
 		GreenThread next = null;
 		for (GreenThread t = queue; t != null; t = next)
 		{
+			if (super.realtime && super.signaled != null)
+			{
+				super.signaled.run();
+				super.signaled = null;
+			}
 			next = t.next();
 			
 			if (t.killed())
@@ -76,5 +84,23 @@ public class PriorityScheduler extends Scheduler {
 			schedule();
 			exec();
 		}
+	}
+
+	public GreenThread getThreadByID(int id)
+	{
+		for (int i = 0; i < prios; i++)
+		{
+			for (GreenThread t = threads[i]; t != null; t = t.next())
+			{
+				if (t.pid() == id)
+					return t;
+			}
+		}
+		for (GreenThread t = queue; t != null; t = t.next())
+		{
+			if (t.pid() == id)
+				return t;
+		}
+		return null;
 	}
 }

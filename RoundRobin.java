@@ -17,11 +17,13 @@
  */
 public class RoundRobin extends Scheduler {
 	
-	int no_threads = 0;
-	GreenThread threads = null;
-	
-	public RoundRobin(int prios)
+	private int no_threads = 0;
+	private GreenThread threads = null;
+	private GreenThread signaled = null;
+
+	public RoundRobin(int prios, boolean realtime)
 	{
+		super.realtime = realtime;
 		// We're just gonna leave priorities for what they are
 	}
 
@@ -32,6 +34,11 @@ public class RoundRobin extends Scheduler {
 		prev = threads;
 		for (GreenThread t = threads; t != null; t = next)
 		{
+			if (super.realtime && signaled != null)
+			{
+				signaled.run();
+			}
+
 			next = t.next();
 			if (t.killed())
 			{
@@ -42,13 +49,23 @@ public class RoundRobin extends Scheduler {
 
 				no_threads--;
 				continue;
-			
+
 			}
 			t.run();
 			prev = t;
 		}
 	}
-	
+
+	public GreenThread getThreadByID(int id)
+	{
+		for (GreenThread t = threads; t != null; t = t.next())
+		{
+			if (t.pid() == id)
+				return t;
+		}
+		return null;
+	}
+
 	@Override
 	public void start() {
 		while (no_threads != 0)
@@ -56,11 +73,11 @@ public class RoundRobin extends Scheduler {
 	}
 
 	@Override
-	public void threadAdd(GreenThread t) {
+	public int threadAdd(GreenThread t) {
+		t.pid(super.next_pid());
 		t.next(threads);
 		threads = t;
 		no_threads++;
-		
+		return t.pid();
 	}
-
 }

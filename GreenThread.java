@@ -20,36 +20,59 @@ public abstract class GreenThread {
 	protected int priority;
 	private GreenThread next;
 	private boolean killed = false;
-	
+	private int signal = 0;
+	private int pid = 0;
+
 	public GreenThread next()
 	{
 		return this.next;
 	}
-	
+
+	public void pid (int pid)
+	{
+		if (this.pid == 0)
+			this.pid = pid;
+	}
+
+	public int pid ()
+	{
+		return this.pid;
+	}
+
+	public void signal(int signal)
+	{
+		this.signal = signal;
+	}
+
+	protected int signal()
+	{
+		return this.signal;
+	}
+
 	public boolean killed()
 	{
 		return this.killed;
 	}
-	
-	protected void kill()
+
+	public void kill()
 	{
 		this.killed = true;
 	}
-	
+
 	public void next(GreenThread next)
 	{
 		this.next = next;
 	}
-	
+
 	public int priority()
 	{
 		return this.priority;
 	}
-	
+
 	protected void priority(int priority)
 	{
 		this.priority = priority;
 	}
-	
+
 	public abstract void run();
 }

@@ -19,9 +19,17 @@ public class Sys {
 		return sys;
 	}
 
-	public void threadAdd(GreenThread t)
+	public void signal(int pid, int signal)
 	{
-		sched.threadAdd(t);
+		sched.signal(pid, signal);
+	}
+	public GreenThread getThreadByID(int id)
+	{
+		return sched.getThreadByID(id);
+	}
+	public int threadAdd(GreenThread t)
+	{
+		return sched.threadAdd(t);
 	}
 
 	public void start()

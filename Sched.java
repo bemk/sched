@@ -25,11 +25,8 @@ public class Sched
 	
 	public Sched()
 	{
-		Sys s = Sys.getInstance(new PriorityScheduler(16));
-		s.threadAdd(new Test('a', 0, 256));
-		s.threadAdd(new Test('b', 1, 128));
-		s.threadAdd(new Test('c', 3,  64));
-		System.err.println("Starting!");
+		Sys s = Sys.getInstance(new PriorityScheduler(16, true));
+		s.threadAdd(new TestInit(10));
 		s.start();
 		System.exit(0);
 	}
