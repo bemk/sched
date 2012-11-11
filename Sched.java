@@ -25,10 +25,10 @@ public class Sched
 	
 	public Sched()
 	{
-		Scheduler s = new RoundRobbin(16);
-		s.threadAdd(new Test('a', 0, 1));
-		s.threadAdd(new Test('b', 1, 2));
-		s.threadAdd(new Test('c', 3, 4));
+		Scheduler s = new RoundRobin(16);
+		s.threadAdd(new Test('a', 0, 256));
+		s.threadAdd(new Test('b', 1, 128));
+		s.threadAdd(new Test('c', 3,  64));
 		System.err.println("Starting!");
 		s.start();
 		System.exit(0);

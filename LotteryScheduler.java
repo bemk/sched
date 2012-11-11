@@ -19,12 +19,12 @@ import java.util.Random;
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class RandomScheduler extends Scheduler{
+public class LotteryScheduler extends Scheduler{
 	private Random r = new Random();
 	ArrayList<GreenThread> threads = null;
 	int priorities = 0;
 	
-	public RandomScheduler(int priorities)
+	public LotteryScheduler(int priorities)
 	{
 		this.priorities = priorities;
 		threads = new ArrayList<GreenThread>();
@@ -56,7 +56,7 @@ public class RandomScheduler extends Scheduler{
 
 	@Override
 	public void threadAdd(GreenThread t) {
-		for (int i = 0; i < (priorities - t.priority); i++)
+		for (int i = 0; i < t.priority(); i++)
 			threads.add(t);
 	}
 

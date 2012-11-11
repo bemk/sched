@@ -15,12 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class RoundRobbin extends Scheduler {
+public class RoundRobin extends Scheduler {
 	
 	int no_threads = 0;
 	GreenThread threads = null;
 	
-	public RoundRobbin(int prios)
+	public RoundRobin(int prios)
 	{
 		// We're just gonna leave priorities for what they are
 	}
