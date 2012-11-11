@@ -28,16 +28,24 @@ public class RoundRobbin extends Scheduler {
 	private void exec()
 	{
 		GreenThread next = null;
+		GreenThread prev = null;
+		prev = threads;
 		for (GreenThread t = threads; t != null; t = next)
 		{
 			next = t.next();
 			if (t.killed())
 			{
+				if (prev == t)
+					threads = t.next();
+				else
+					prev.next(t.next());
+
 				no_threads--;
 				continue;
-			}
 			
+			}
 			t.run();
+			prev = t;
 		}
 	}
 	
