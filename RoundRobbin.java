@@ -15,46 +15,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-public class PriorityScheduler extends Scheduler {
-	private int prios;
-	
-	private GreenThread[] threads;
-	private GreenThread queue = null;
+public class RoundRobbin extends Scheduler {
 	
 	int no_threads = 0;
-	int dbg = 0;
+	GreenThread threads = null;
 	
-	public PriorityScheduler(int prios)
+	public RoundRobbin(int prios)
 	{
-		this.prios = prios;
-		threads = new GreenThread[prios];
+		// We're just gonna leave prios for what they are
 	}
-	
-	public void threadAdd(GreenThread t)
-	{
-		t.next(threads[t.priority()]);
-		threads[t.priority()] = t;
-		no_threads++;
-	}
-	
-	private void schedule()
-	{
-		queue = threads[0];
-		int i = 0;
-		while (i < prios-1)
-			threads[i] = threads[++i];
-		
-		threads[prios-1] = null;
-	}
-	
+
 	private void exec()
 	{
 		GreenThread next = null;
-		for (GreenThread t = queue; t != null; t = next)
+		for (GreenThread t = threads; t != null; t = next)
 		{
 			next = t.next();
-			
 			if (t.killed())
 			{
 				no_threads--;
@@ -62,19 +38,23 @@ public class PriorityScheduler extends Scheduler {
 			}
 			
 			t.run();
-			
-			t.next(threads[t.priority()]);
-			threads[t.priority()] = t;
 		}
 	}
 	
-	public void start()
-	{
-		while(no_threads != 0)
-		{
-			//System.err.printf("Itteration: %d, %d threads\n", dbg++, no_threads);
-			schedule();
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		while (no_threads != 0)
 			exec();
-		}
 	}
+
+	@Override
+	public void threadAdd(GreenThread t) {
+		// TODO Auto-generated method stub
+		t.next(threads);
+		threads = t;
+		no_threads++;
+		
+	}
+
 }
